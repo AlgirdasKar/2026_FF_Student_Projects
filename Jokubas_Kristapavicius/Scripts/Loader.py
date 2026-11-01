@@ -45,9 +45,6 @@ def image_EXIF_data_loader(Data_dir):
 
     df = pd.DataFrame(Picture_directories_data).T
     return df
-data_dir = "../Data/Raw/Film"
-data = image_EXIF_data_loader(data_dir)
-print(data["DateTime"].unique())
 
 
 # img_path_relative = Path(r"C:\Users\jkris\Desktop\University\Vilnius_University\Year_2\Sem_3\CERN Data Analysis\The_Project_Photo_Data_Exploration\Data\Raw\Test_Data\2024 09-10 Cinestill 800T\000018240018.jpg")

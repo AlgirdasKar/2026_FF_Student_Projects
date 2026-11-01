@@ -2,12 +2,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time
 from Loader import image_EXIF_data_loader
-from Test_02_picture_single import dominant_colour_finder
+from Dominant_Colour import dominant_colour_finder
 import numpy as np
 from pathlib import Path
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.manifold import TSNE
-raw_data_dir = Path(r".\Data\Raw\Test_Data")
+raw_data_dir = Path(r"../Data/Raw/Film")
 # raw_data_dir = Path(r".\Data\Raw\Film")
 start_import = time.perf_counter() 
 raw_data_frame = image_EXIF_data_loader(Data_dir=raw_data_dir)
@@ -35,7 +35,7 @@ exif_data_frame["ColourModel"] = exif_data_frame["Make"].map(
     lambda name: float(name))
 plt.scatter(time_embedung[:,0],
             time_embedung[:,1],
-            c = raw_data_frame["ColourModel"]
+            # c = raw_data_frame["ColourModel"]
             )
 plt.axis('off')
 plt.show()

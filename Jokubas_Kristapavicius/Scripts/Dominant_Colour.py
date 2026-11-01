@@ -15,7 +15,10 @@ def dominant_colour_finder(image_dir,number_of_colours = 3,max_dim = 200, seed =
 
     returns the array of dominant colours in RGB space
     """
-    image = cv2.imread(image_dir, cv2.COLOR_BGR2RGB)
+    image = cv2.imread(image_dir)
+    if image is None:
+        print(f"Perhaps corrupted img at {image_dir}, output is NaN")
+        return np.nan
     image = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)  #translates colour to usual RGB
 
     height, width = image.shape[:2]
