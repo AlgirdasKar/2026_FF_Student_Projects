@@ -9,7 +9,7 @@ class FilmExifApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Film EXIF Injector")
-        self.root.geometry("450x350")
+        self.root.geometry("450x420")
         self.folder_path = tk.StringVar()
         
         # UI Elements
@@ -24,9 +24,13 @@ class FilmExifApp:
         self.end_entry = tk.Entry(root, width=25)
         self.end_entry.pack(pady=5)
         
-        tk.Label(root, text="Film Used (Camera Model EXIF):").pack()
+        tk.Label(root, text="Film Used (Optional):").pack()
         self.model_entry = tk.Entry(root, width=25)
         self.model_entry.pack(pady=5)
+
+        tk.Label(root, text="ISO (Optional):").pack()
+        self.iso_entry = tk.Entry(root, width=25)
+        self.iso_entry.pack(pady=5)
         
         tk.Button(root, text="Start Processing", command=self.process_images, bg="green", fg="white").pack(pady=20)
         
@@ -43,13 +47,13 @@ class FilmExifApp:
         start_str = self.start_entry.get().strip()
         end_str = self.end_entry.get().strip()
         film_model = self.model_entry.get().strip()
+        iso_str = self.iso_entry.get().strip()
         
-        if not folder or not start_str or not end_str or not film_model:
-            messagebox.showerror("Error", "All fields are required.")
+        if not folder or not start_str or not end_str:
+            messagebox.showerror("Error", "Folder and both dates are required.")
             return
 
         try:
-            # Parse only the YYYY-MM-DD format
             start_date = datetime.strptime(start_str, "%Y-%m-%d")
             end_date = datetime.strptime(end_str, "%Y-%m-%d")
         except ValueError:
@@ -59,6 +63,15 @@ class FilmExifApp:
         if end_date <= start_date:
             messagebox.showerror("Error", "Unload date must be after Load date.")
             return
+
+        # Validate ISO if provided
+        iso_val = None
+        if iso_str:
+            try:
+                iso_val = int(iso_str)
+            except ValueError:
+                messagebox.showerror("Error", "ISO must be a valid number.")
+                return
 
         valid_extensions = ('.png', '.jpeg', '.jpg', '.tiff', '.tif')
         images = [f for f in os.listdir(folder) if f.lower().endswith(valid_extensions)]
@@ -81,15 +94,14 @@ class FilmExifApp:
         for i, img_name in enumerate(images):
             img_path = os.path.join(folder, img_name)
             current_time = start_date + (interval * i)
-            # The EXIF standard still requires hours/minutes/seconds, so Python generates them based on the interval
             exif_time_str = current_time.strftime("%Y:%m:%d %H:%M:%S")
             
             ext = img_name.lower()
             try:
                 if ext in ('.jpg', '.jpeg'):
-                    self.process_jpeg(img_path, exif_time_str, film_model)
+                    self.process_jpeg(img_path, exif_time_str, film_model, iso_val)
                 else:
-                    self.process_lossless(img_path, exif_time_str, film_model)
+                    self.process_lossless(img_path, exif_time_str, film_model, iso_val)
                 success_count += 1
             except Exception as e:
                 print(f"Failed to process {img_name}: {e}")
@@ -97,7 +109,7 @@ class FilmExifApp:
         self.status_label.config(text=f"Success! Updated {success_count}/{num_images} images.", fg="green")
         messagebox.showinfo("Done", f"Successfully updated {success_count} images.")
 
-    def process_jpeg(self, filepath, time_str, model):
+    def process_jpeg(self, filepath, time_str, model, iso):
         try:
             exif_dict = piexif.load(filepath)
         except Exception:
@@ -106,21 +118,33 @@ class FilmExifApp:
         exif_dict["0th"][piexif.ImageIFD.DateTime] = time_str.encode("utf-8")
         exif_dict["Exif"][piexif.ExifIFD.DateTimeOriginal] = time_str.encode("utf-8")
         exif_dict["Exif"][piexif.ExifIFD.DateTimeDigitized] = time_str.encode("utf-8")
-        exif_dict["0th"][piexif.ImageIFD.Model] = model.encode("utf-8")
+        
+        if model:
+            exif_dict["0th"][piexif.ImageIFD.Model] = model.encode("utf-8")
+            
+        # ISO Speed Ratings Tag in ExifIFD expects an integer
+        if iso is not None:
+            exif_dict["Exif"][piexif.ExifIFD.ISOSpeedRatings] = iso
         
         exif_bytes = piexif.dump(exif_dict)
         piexif.insert(exif_bytes, filepath)
 
-    def process_lossless(self, filepath, time_str, model):
+    def process_lossless(self, filepath, time_str, model, iso):
         with Image.open(filepath) as img:
             exif = img.getexif()
             
             exif[306] = time_str 
-            exif[272] = model    
+            
+            if model:
+                exif[272] = model    
             
             exif_ifd = exif.get_ifd(0x8769)
             exif_ifd[36867] = time_str 
             exif_ifd[36868] = time_str 
+            
+            # ISO Speed Ratings tag is 34855
+            if iso is not None:
+                exif_ifd[34855] = iso
             
             img.save(filepath, exif=exif)
 
