@@ -14,7 +14,9 @@ def image_EXIF_data_loader(Data_dir):
     formats = tuple((".jpg", "jpeg", ".tiff", ".tif", ".png"))
     mediums = ["Digital", "Film", "Collage"]
     if isinstance(Data_dir, str):
-        Data_dir = Path(Data_dir) 
+        Data_dir = Path(Data_dir)
+    if os.path.isdir(Data_dir)==False:
+        print(f"{str(Data_dir)} is non-existing dir") 
     Picture_directories_data = {}
     for root, dirs, files in Path.walk(Data_dir): #walks trought everything in Data_dir
 
@@ -45,7 +47,9 @@ def image_EXIF_data_loader(Data_dir):
     return df
 """Date seperator must look at all add film category pics and ASSUME that for camera Maker (column Make)
 every image was taken in equally spaced time"""
-
+test_data = "../Data/Raw/"
+test_data = image_EXIF_data_loader(test_data)
+print(test_data["DateTime"].unique())
 
 
 # img_path_relative = Path(r"C:\Users\jkris\Desktop\University\Vilnius_University\Year_2\Sem_3\CERN Data Analysis\The_Project_Photo_Data_Exploration\Data\Raw\Test_Data\2024 09-10 Cinestill 800T\000018240018.jpg")
