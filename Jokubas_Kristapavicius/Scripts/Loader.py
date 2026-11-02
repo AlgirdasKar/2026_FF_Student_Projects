@@ -11,6 +11,7 @@ def image_EXIF_data_loader(Data_dir):
         ["Digital", "Film", "Collage"]
         The formats supported are as following:
         [".jpg", "jpeg", ".tiff", ".tif", ".png"]"""
+    load_index = 0
     formats = tuple((".jpg", "jpeg", ".tiff", ".tif", ".png"))
     mediums = ["Digital", "Film", "Collage"]
     if isinstance(Data_dir, str):
@@ -40,7 +41,8 @@ def image_EXIF_data_loader(Data_dir):
                     if medium.lower() in (str(root)).lower():
                         empty_dic["Medium"] = medium
                 empty_dic["Directory"] = picture_dir
-                Picture_directories_data[picture_dir] = empty_dic
+                Picture_directories_data[load_index] = empty_dic
+                load_index = load_index + 1
             
 
     df = pd.DataFrame(Picture_directories_data).T
