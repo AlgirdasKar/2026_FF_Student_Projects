@@ -26,6 +26,7 @@ exif_data_frame["Dominant_Colour"] = exif_data_frame["Directory"].map(
 exif_data_frame["Dominant_Colour_CIELAB"] = exif_data_frame["Dominant_Colour"].map(
     lambda dom_col_RGB: skimage.color.rgb2lab(np.array(dom_col_RGB, dtype = float)/255.0)
     if isinstance(dom_col_RGB,np.ndarray) else np.nan)
+exif_data_frame = exif_data_frame.dropna(subset=["Dominant_Colour"])
 dom_col_end = time.perf_counter()
 print(f"Find dominant colours in all pics: {dom_col_end - dom_col_start:.3f}s")
 
