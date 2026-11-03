@@ -30,22 +30,3 @@ dom_col_end = time.perf_counter()
 print(f"Find dominant colours in all pics: {dom_col_end - dom_col_start:.3f}s")
 
 exif_data_frame.to_pickle(r"./Data/Processed/processed_image_data.pkl")
-###Machine learning plotter
-
-# RGB = np.array([np.array(x).flatten() for x in exif_data_frame["Dominant_Colour"]])
-# RGB_scaled = MinMaxScaler().fit_transform(RGB)
-# tsne_model = TSNE(n_components=2, perplexity=10, verbose = 1)
-# time_embedung = tsne_model.fit_transform(RGB_scaled)
-# Cameras = exif_data_frame["Make"].unique()
-# Color_number = np.arange(0, len(Cameras))
-
-# # exif_data_frame["ColourModel"] = exif_data_frame["Make"].map(
-#     # lambda name: float(name))
-# plt.scatter(time_embedung[:,0],
-#             time_embedung[:,1],
-#             # c = raw_data_frame["ColourModel"]
-#             )
-# plt.axis('off')
-# plt.show()
-
-# R, G, B = RGB[0], RGB[1], RGB[2] 
