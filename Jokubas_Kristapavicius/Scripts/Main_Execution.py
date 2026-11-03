@@ -18,12 +18,12 @@ end_import = time.perf_counter()
 print(f"Import meta data time elapsed: {end_import - start_import  :.3f}s")
 
 ###FIND DOM COLOR FOR EACH PIC
-# dom_col_start = time.perf_counter()
-# exif_data_frame["Dominant_Colour"] = exif_data_frame["Directory"].map(
-#     lambda dir_path: dominant_colour_finder(dir_path, number_of_colours = 3 )
-#     )
-# dom_col_end = time.perf_counter()
-# print(f"Find dominant colours in all pics: {dom_col_end - dom_col_start:.3f}s")
+dom_col_start = time.perf_counter()
+exif_data_frame["Dominant_Colour"] = exif_data_frame["Directory"].map(
+    lambda dir_path: dominant_colour_finder(dir_path, number_of_colours = 3 )
+    )
+dom_col_end = time.perf_counter()
+print(f"Find dominant colours in all pics: {dom_col_end - dom_col_start:.3f}s")
 
 ###Machine learning plotter
 
