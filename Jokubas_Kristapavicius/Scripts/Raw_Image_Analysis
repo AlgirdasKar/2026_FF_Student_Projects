@@ -5,6 +5,7 @@ from Loader import image_EXIF_data_loader
 from Dominant_Colour import dominant_colour_finder
 import numpy as np
 from pathlib import Path
+import skimage
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.manifold import TSNE
 raw_data_dir = Path(r"./Data/Raw/Test_Data")
@@ -22,9 +23,13 @@ dom_col_start = time.perf_counter()
 exif_data_frame["Dominant_Colour"] = exif_data_frame["Directory"].map(
     lambda dir_path: dominant_colour_finder(dir_path, number_of_colours = 3 )
     )
+exif_data_frame["Dominant_Colour_CIELAB"] = exif_data_frame["Dominant_Colour"].map(
+    lambda dom_col_RGB: skimage.color.rgb2lab(np.array(dom_col_RGB, dtype = float)/255.0)
+    if isinstance(dom_col_RGB,np.ndarray) else np.nan)
 dom_col_end = time.perf_counter()
 print(f"Find dominant colours in all pics: {dom_col_end - dom_col_start:.3f}s")
 
+exif_data_frame.to_pickle(r"./Data/Processed/processed_image_data.pkl")
 ###Machine learning plotter
 
 # RGB = np.array([np.array(x).flatten() for x in exif_data_frame["Dominant_Colour"]])
@@ -44,4 +49,3 @@ print(f"Find dominant colours in all pics: {dom_col_end - dom_col_start:.3f}s")
 # plt.show()
 
 # R, G, B = RGB[0], RGB[1], RGB[2] 
-exif_data_frame.to_pickle(r"./Data/Processed/processed_image_data.pkl")
